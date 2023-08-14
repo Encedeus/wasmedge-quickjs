@@ -20,6 +20,8 @@ use std::mem;
 use std::mem::ManuallyDrop;
 use std::ops::DerefMut;
 
+use include_dir::{Dir, include_dir};
+
 struct DroppableValue<T, F>
 where
     F: FnMut(&mut T),
@@ -102,13 +104,29 @@ unsafe extern "C" fn module_loader(
         }
     }
 
-    if !path.is_file() {
-        let modules_dir = std::env::var("QJS_LIB").unwrap_or("./modules".to_string());
-        path = std::path::PathBuf::from(modules_dir).join(path);
-    }
+    // if !path.is_file() {
+    //     // let modules_dir = std::env::var("QJS_LIB").unwrap_or("./modules".to_string());
+    //     path = std::path::PathBuf::from(modules_dir).join(path);
+    // }
 
-    let code = std::fs::read(&path);
-    if code.is_err() {
+    // let code = std::fs::read(&path);
+    // if code.is_err() {
+    //     JS_ThrowReferenceError(
+    //         ctx,
+    //         "could not load module filename '%s'\0".as_ptr().cast(),
+    //         module_name_,
+    //     );
+    //     return std::ptr::null_mut();
+    // }
+    //
+    // let buf = code.unwrap();
+    // let buf_len = buf.len();
+    // let buf = make_c_string(buf);
+
+    static MODULES_DIR: Dir = include_dir!("modules");
+    let code = MODULES_DIR.get_file(path);
+
+    if code.is_none() {
         JS_ThrowReferenceError(
             ctx,
             "could not load module filename '%s'\0".as_ptr().cast(),
@@ -117,7 +135,7 @@ unsafe extern "C" fn module_loader(
         return std::ptr::null_mut();
     }
 
-    let buf = code.unwrap();
+    let buf = code.unwrap().contents_utf8().unwrap();
     let buf_len = buf.len();
     let buf = make_c_string(buf);
 
