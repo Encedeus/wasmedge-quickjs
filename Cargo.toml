@@ -2,7 +2,7 @@
 name = "encedeus_js_runtime"
 version = "0.1.0-alpha"
 authors = ["csh <458761603@qq.com>", "Michael Yuan <michael@secondstate.io>"]
-description = "Fork of wasmedge-quickjs engin."
+description = "Fork of wasmedge-quickjs engine for Encedeus panel."
 repository = "https://github.com/Encedeus/wasmedge-quickjs"
 license = "MIT OR Apache-2.0"
 readme = "README.md"
